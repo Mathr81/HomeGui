@@ -1,6 +1,7 @@
 package com.example.homegui.screen;
 
 import com.example.homegui.HomesManager;
+import com.example.homegui.config.LangManager;
 import com.example.homegui.config.ModConfig;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -9,6 +10,16 @@ import net.minecraft.text.Text;
 import java.util.List;
 
 public class HistoryScreen extends Screen {
+
+    private static final int COLOR_BG     = 0xEE0A0A1A;
+    private static final int COLOR_PANEL  = 0xDD121228;
+    private static final int COLOR_ACCENT = 0xFF5B5BFF;
+    private static final int COLOR_TEXT   = 0xFFE0E0FF;
+    private static final int COLOR_DIM    = 0xFF8888AA;
+    private static final int COLOR_BORDER = 0xFF3A3A7A;
+    private static final int COLOR_BTN    = 0xFF1E1E3F;
+    private static final int COLOR_ENTRY  = 0xFF1A1A3A;
+    private static final int COLOR_HOVER  = 0xFF2A2A5A;
 
     private final Screen parent;
     private int hoveredIndex = -1;
@@ -19,66 +30,40 @@ public class HistoryScreen extends Screen {
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        context.fill(0, 0, width, height, 0xCC000000);
+    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+        ctx.fill(0, 0, width, height, COLOR_BG);
+
+        int panelX = width / 2 - 130;
+        int panelW = 260;
+        int panelY = 20;
+        int panelH = height - 50;
+
+        // Panneau
+        ctx.fill(panelX, panelY, panelX + panelW, panelY + panelH, COLOR_PANEL);
+        ctx.fill(panelX, panelY, panelX + panelW, panelY + 1, COLOR_BORDER);
+        ctx.fill(panelX, panelY + panelH - 1, panelX + panelW, panelY + panelH, COLOR_BORDER);
+        ctx.fill(panelX, panelY, panelX + 1, panelY + panelH, COLOR_BORDER);
+        ctx.fill(panelX + panelW - 1, panelY, panelX + panelW, panelY + panelH, COLOR_BORDER);
+
+        // Titre
+        String title = LangManager.getInstance().get("title.history");
+        ctx.drawCenteredTextWithShadow(textRenderer,
+                Text.literal("⟳ " + title), width / 2, panelY + 8, COLOR_ACCENT);
 
         List<ModConfig.HistoryEntry> history = ModConfig.getInstance().getHistory();
-
         hoveredIndex = -1;
-        int y = 60;
+        int y = panelY + 26;
 
-        for (int i = 0; i < history.size(); i++) {
-            String home = history.get(i).homeName;
+        if (history.isEmpty()) {
+            ctx.drawCenteredTextWithShadow(textRenderer,
+                    Text.literal("§7" + LangManager.getInstance().get("message.no_history")),
+                    width / 2, y + 20, COLOR_DIM);
+        } else {
+            for (int i = 0; i < history.size() && i < 12; i++) {
+                ModConfig.HistoryEntry entry = history.get(i);
+                int bX = panelX + 12;
+                int bW = panelW - 24;
+                int bH = 22;
 
-            boolean hovered = mouseX >= width / 2 - 100 &&
-                    mouseX <= width / 2 + 100 &&
-                    mouseY >= y &&
-                    mouseY <= y + 20;
-
-            if (hovered) hoveredIndex = i;
-
-            context.fill(width / 2 - 100, y, width / 2 + 100, y + 20,
-                    hovered ? 0xFF884444 : 0xFF442222);
-
-            context.drawCenteredTextWithShadow(textRenderer,
-                    Text.literal(home),
-                    width / 2,
-                    y + 6,
-                    0xFFFFFF);
-
-            y += 25;
-        }
-
-        super.render(context, mouseX, mouseY, delta);
-    }
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-
-        if (hoveredIndex >= 0) {
-            List<ModConfig.HistoryEntry> history = ModConfig.getInstance().getHistory();
-            if (hoveredIndex < history.size()) {
-                String home = history.get(hoveredIndex).homeName;
-                ModConfig.getInstance().incrementUseCount(home);
-                HomesManager.getInstance().teleportToHome(home);
-                return true;
-            }
-        }
-
-        return super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == 256) {
-            client.setScreen(parent);
-            return true;
-        }
-        return super.keyPressed(keyCode, scanCode, modifiers);
-    }
-
-    @Override
-    public boolean shouldPause() {
-        return false;
-    }
-}
+                boolean hov = mouseX >= bX && mouseX <= bX + bW
+                        && mouseY >= y 
