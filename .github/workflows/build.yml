@@ -35,5 +35,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: homegui-${{ github.sha }}
-          path: build/libs/*.jar
+          path: build/libs/*-[0-9]*.jar
           if-no-files-found: error
