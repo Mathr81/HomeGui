@@ -4,8 +4,6 @@ import com.example.homegui.HomesManager;
 import com.example.homegui.config.ModConfig;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.Click;
-import net.minecraft.client.gui.screen.KeyInput;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
@@ -59,30 +57,29 @@ public class HomesScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(Click click, boolean doubleClick) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+
         if (hoveredIndex >= 0) {
             String home = homes.get(hoveredIndex);
 
-            if (click.button() == 0) {
+            if (button == 0) {
                 ModConfig.getInstance().incrementUseCount(home);
                 ModConfig.getInstance().addToHistory(home);
                 HomesManager.getInstance().teleportToHome(home);
                 return true;
             }
 
-            if (click.button() == 1) {
+            if (button == 1) {
                 ModConfig.getInstance().toggleFavorite(home);
                 return true;
             }
         }
 
-        return super.mouseClicked(click, doubleClick);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
-    public boolean keyPressed(KeyInput input) {
-
-        int keyCode = input.keyCode();
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 
         if (keyCode >= 49 && keyCode <= 57) {
             int index = keyCode - 49;
@@ -99,7 +96,7 @@ public class HomesScreen extends Screen {
             return true;
         }
 
-        return super.keyPressed(input);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
