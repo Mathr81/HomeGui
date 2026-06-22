@@ -11,6 +11,10 @@ base {
 }
 
 repositories {
+    maven {
+        name = "Fabric"
+        url  = "https://maven.fabricmc.net/"
+    }
     mavenCentral()
 }
 
@@ -30,8 +34,7 @@ dependencies {
     mappings   "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
-    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation    'com.google.code.gson:gson:2.10.1'
 }
 
 processResources {
@@ -43,9 +46,10 @@ processResources {
 }
 
 def targetJavaVersion = 21
+
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = "UTF-8"
-    it.options.release   = targetJavaVersion
+    it.options.release  = targetJavaVersion
 }
 
 java {
