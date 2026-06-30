@@ -1,4 +1,4 @@
-package com.example.homegui.config;
+package com.maxlananas.homegui.config;
 
 public class LangManager {
 
