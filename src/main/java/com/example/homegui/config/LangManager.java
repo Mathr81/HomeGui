@@ -60,7 +60,7 @@ public class LangManager {
             case "stats.total_homes"   -> fr ? "homes"               : "homes";
             case "stats.favorites"     -> fr ? "favoris"             : "favorites";
             case "stats.total_tp"      -> fr ? "teleports"           : "teleports";
-            case "stats.top_homes"     -> "TOP 5 HOMES";
+            case "stats.top_homes"     -> fr ? "Les 5 Meilleurs Home": "TOP 5 HOMES";
             case "stats.visits"        -> fr ? "visite"              : "visit";
             case "stats.visits_plural" -> fr ? "visites"             : "visits";
             case "favorite.right_click"-> fr ? "Clic droit = favori" : "Right click = fav";
