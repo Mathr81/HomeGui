@@ -92,9 +92,9 @@ public class HistoryScreen extends Screen {
         int bH     = 16;
         int clearX = panelX + (panelW / 2) - bW - 4;
         int backX  = panelX + (panelW / 2) + 4;
+
         boolean clearHov = mouseX >= clearX && mouseX <= clearX + bW
                 && mouseY >= btnY && mouseY <= btnY + bH;
-
         ctx.fill(clearX, btnY, clearX + bW, btnY + bH,
                 clearHov ? 0xFF3A1A1A : COLOR_BTN);
         ctx.fill(clearX, btnY, clearX + bW, btnY + 1,
