@@ -31,19 +31,12 @@ public class ModConfig {
         return instance;
     }
 
-    // ─── Langue ────────────────────────────────────────────
     public String  getLanguage()           { return language; }
     public void    setLanguage(String l)   { language = l; save(); }
-
-    // ─── Thème ─────────────────────────────────────────────
     public int  getThemeIndex()        { return themeIndex; }
     public void setThemeIndex(int idx) { themeIndex = idx; save(); }
-
-    // ─── Mode compact ──────────────────────────────────────
     public boolean isCompactMode()         { return compactMode; }
     public void    setCompactMode(boolean c) { compactMode = c; save(); }
-
-    // ─── Favoris ───────────────────────────────────────────
     public boolean isFavorite(String home) {
         return favorites.contains(home.toLowerCase());
     }
@@ -54,7 +47,6 @@ public class ModConfig {
         favorites.add(k); save(); return true;
     }
 
-    // ─── Statistiques ──────────────────────────────────────
     public int getUseCount(String home) {
         return useCounts.getOrDefault(home.toLowerCase(), 0);
     }
@@ -68,8 +60,6 @@ public class ModConfig {
 
     public int getTotalTeleports()       { return totalTeleports; }
     public Map<String,Integer> getAllUseCounts() { return new HashMap<>(useCounts); }
-
-    // ─── Historique ────────────────────────────────────────
     public void addToHistory(String home) {
         history.removeIf(e -> e.homeName.equalsIgnoreCase(home));
         history.add(0, new HistoryEntry(home, System.currentTimeMillis()));
@@ -79,8 +69,6 @@ public class ModConfig {
 
     public List<HistoryEntry> getHistory()  { return new ArrayList<>(history); }
     public void clearHistory()              { history.clear(); save(); }
-
-    // ─── Persistance ───────────────────────────────────────
     private void save() {
         try {
             JsonObject json = new JsonObject();
@@ -152,7 +140,7 @@ public class ModConfig {
                 }
             }
         } catch (Exception e) {
-            System.err.println("[HomeGUI] Config corrompue, reset. " + e.getMessage());
+            System.err.println("[HomeGUI] Lost config, reset. " + e.getMessage());
             resetToDefaults();
         }
     }
@@ -164,8 +152,6 @@ public class ModConfig {
         try { Files.deleteIfExists(CONFIG_PATH); } catch (IOException ignored) {}
         save();
     }
-
-    // ─── HistoryEntry ──────────────────────────────────────
     public static class HistoryEntry {
         public String homeName;
         public long   timestamp;
