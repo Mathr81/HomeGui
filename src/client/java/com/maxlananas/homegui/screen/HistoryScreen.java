@@ -1,8 +1,8 @@
-package com.example.homegui.screen;
+package com.maxlananas.homegui.screen;
 
-import com.example.homegui.HomesManager;
-import com.example.homegui.config.LangManager;
-import com.example.homegui.config.ModConfig;
+import com.maxlananas.homegui.HomesManager;
+import com.maxlananas.homegui.config.LangManager;
+import com.maxlananas.homegui.config.ModConfig;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -38,14 +38,12 @@ public class HistoryScreen extends Screen {
         int panelY = 20;
         int panelH = height - 50;
 
-        // Panneau
         ctx.fill(panelX, panelY, panelX + panelW, panelY + panelH, COLOR_PANEL);
         ctx.fill(panelX, panelY, panelX + panelW, panelY + 1, COLOR_BORDER);
         ctx.fill(panelX, panelY + panelH - 1, panelX + panelW, panelY + panelH, COLOR_BORDER);
         ctx.fill(panelX, panelY, panelX + 1, panelY + panelH, COLOR_BORDER);
         ctx.fill(panelX + panelW - 1, panelY, panelX + panelW, panelY + panelH, COLOR_BORDER);
 
-        // Titre
         String title = LangManager.getInstance().get("title.history");
         ctx.drawCenteredTextWithShadow(textRenderer,
                 Text.literal("⟳ " + title), width / 2, panelY + 8, COLOR_ACCENT);
@@ -72,18 +70,15 @@ public class HistoryScreen extends Screen {
                 ctx.fill(bX, y, bX + bW, y + bH, hov ? COLOR_HOVER : COLOR_ENTRY);
                 ctx.fill(bX, y, bX + bW, y + 1, hov ? COLOR_ACCENT : COLOR_BORDER);
 
-                // Numéro
                 ctx.drawTextWithShadow(textRenderer,
                         Text.literal("§8" + (i + 1) + "."),
                         bX + 4, y + 7, COLOR_DIM);
 
-                // Nom du home
                 ctx.drawCenteredTextWithShadow(textRenderer,
                         Text.literal(entry.homeName),
                         bX + bW / 2, y + 7,
                         hov ? 0xFFFFFFFF : COLOR_TEXT);
 
-                // Temps écoulé
                 ctx.drawTextWithShadow(textRenderer,
                         Text.literal("§8" + entry.getTimeAgo()),
                         bX + bW - 28, y + 7, COLOR_DIM);
@@ -92,14 +87,11 @@ public class HistoryScreen extends Screen {
             }
         }
 
-        // Boutons bas
         int btnY  = panelY + panelH - 22;
         int bW    = 80;
         int bH    = 16;
         int clearX = panelX + (panelW / 2) - bW - 4;
         int backX  = panelX + (panelW / 2) + 4;
-
-        // Bouton Clear
         boolean clearHov = mouseX >= clearX && mouseX <= clearX + bW
                 && mouseY >= btnY && mouseY <= btnY + bH;
         ctx.fill(clearX, btnY, clearX + bW, btnY + bH,
@@ -111,7 +103,6 @@ public class HistoryScreen extends Screen {
                 clearX + bW / 2, btnY + 4,
                 clearHov ? 0xFFFF6666 : COLOR_DIM);
 
-        // Bouton Retour
         boolean backHov = mouseX >= backX && mouseX <= backX + bW
                 && mouseY >= btnY && mouseY <= btnY + bH;
         ctx.fill(backX, btnY, backX + bW, btnY + bH,
@@ -139,20 +130,17 @@ public class HistoryScreen extends Screen {
         int clearX = panelX + (panelW / 2) - bW - 4;
         int backX  = panelX + (panelW / 2) + 4;
 
-        // Bouton Clear
         if (mx >= clearX && mx <= clearX + bW && my >= btnY && my <= btnY + bH) {
             ModConfig.getInstance().clearHistory();
             return true;
         }
 
-        // Bouton Retour
         if (mx >= backX && mx <= backX + bW && my >= btnY && my <= btnY + bH) {
             assert client != null;
             client.setScreen(parent);
             return true;
         }
-
-        // Clic sur une entrée d'historique
+        
         if (hoveredIndex >= 0) {
             List<ModConfig.HistoryEntry> history = ModConfig.getInstance().getHistory();
             if (hoveredIndex < history.size()) {
@@ -169,7 +157,7 @@ public class HistoryScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == 256) { // Escape
+        if (keyCode == 256) {
             assert client != null;
             client.setScreen(parent);
             return true;
