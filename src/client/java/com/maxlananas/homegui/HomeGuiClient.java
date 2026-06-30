@@ -1,8 +1,8 @@
-package com.example.homegui;
+package com.maxlananas.homegui;
 
-import com.example.homegui.config.LangManager;
-import com.example.homegui.config.ModConfig;
-import com.example.homegui.screen.HomesScreen;
+import com.maxlananas.homegui.config.LangManager;
+import com.maxlananas.homegui.config.ModConfig;
+import com.maxlananas.homegui.screen.HomesScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -39,6 +39,6 @@ public class HomeGuiClient implements ClientModInitializer {
             }
         });
 
-        LOGGER.info("[HomeGUI] Initialisé pour Minecraft 1.21.10 ✓");
+        LOGGER.info("[HomeGUI] Initialized for Minecraft 1.21.10 ✓");
     }
 }
