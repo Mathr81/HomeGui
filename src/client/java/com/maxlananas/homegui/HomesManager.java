@@ -39,8 +39,8 @@ public class HomesManager {
         if (client.player != null) {
             isWaitingForResponse = true;
             lastRequestTime = System.currentTimeMillis();
-            client.player.connection.sendChat("/homes");
-            LOGGER.info("[HomeGUI] Homes list loadings....");
+            client.player.connection.sendCommand("homes");
+            LOGGER.info("[HomeGUI] Homes list loading...");
         }
     }
 
@@ -55,7 +55,7 @@ public class HomesManager {
                 .trim();
         if (parseHomesMessage(clean)) {
             isWaitingForResponse = false;
-            LOGGER.info("[HomeGUI] Homes finds: {}", homes);
+            LOGGER.info("[HomeGUI] Homes found: {}", homes);
         }
     }
 
@@ -104,7 +104,7 @@ public class HomesManager {
     public void teleportToHome(String homeName) {
         Minecraft client = Minecraft.getInstance();
         if (client.player != null) {
-            client.player.connection.sendChat("/home " + homeName);
+            client.player.connection.sendCommand("home " + homeName);
             client.setScreen(null);
         }
     }
