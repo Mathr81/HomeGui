@@ -12,7 +12,7 @@
   "icon": "assets/homegui/icon.png",
   "environment": "client",
   "entrypoints": {
-    "client": ["com.example.homegui.HomeGuiClient"]
+    "client": ["com.maxlananas.homegui.HomeGuiClient"]
   },
   "mixins": ["homegui.mixins.json"],
   "depends": {
