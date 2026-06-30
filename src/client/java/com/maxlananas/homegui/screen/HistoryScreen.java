@@ -3,9 +3,9 @@ package com.maxlananas.homegui.screen;
 import com.maxlananas.homegui.HomesManager;
 import com.maxlananas.homegui.config.LangManager;
 import com.maxlananas.homegui.config.ModConfig;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 import java.util.List;
 
@@ -25,12 +25,12 @@ public class HistoryScreen extends Screen {
     private int hoveredIndex = -1;
 
     public HistoryScreen(Screen parent) {
-        super(Text.literal("History"));
+        super(Component.literal("History"));
         this.parent = parent;
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics ctx, int mouseX, int mouseY, float delta) {
         ctx.fill(0, 0, width, height, COLOR_BG);
 
         int panelX = width / 2 - 130;
@@ -45,16 +45,16 @@ public class HistoryScreen extends Screen {
         ctx.fill(panelX + panelW - 1, panelY, panelX + panelW, panelY + panelH, COLOR_BORDER);
 
         String title = LangManager.getInstance().get("title.history");
-        ctx.drawCenteredTextWithShadow(textRenderer,
-                Text.literal("⟳ " + title), width / 2, panelY + 8, COLOR_ACCENT);
+        ctx.drawCenteredString(font,
+                Component.literal("⟳ " + title), width / 2, panelY + 8, COLOR_ACCENT);
 
         List<ModConfig.HistoryEntry> history = ModConfig.getInstance().getHistory();
         hoveredIndex = -1;
         int y = panelY + 26;
 
         if (history.isEmpty()) {
-            ctx.drawCenteredTextWithShadow(textRenderer,
-                    Text.literal("§7" + LangManager.getInstance().get("message.no_history")),
+            ctx.drawCenteredString(font,
+                    Component.literal("§7" + LangManager.getInstance().get("message.no_history")),
                     width / 2, y + 20, COLOR_DIM);
         } else {
             for (int i = 0; i < history.size() && i < 12; i++) {
@@ -70,36 +70,37 @@ public class HistoryScreen extends Screen {
                 ctx.fill(bX, y, bX + bW, y + bH, hov ? COLOR_HOVER : COLOR_ENTRY);
                 ctx.fill(bX, y, bX + bW, y + 1, hov ? COLOR_ACCENT : COLOR_BORDER);
 
-                ctx.drawTextWithShadow(textRenderer,
-                        Text.literal("§8" + (i + 1) + "."),
+                ctx.drawString(font,
+                        Component.literal("§8" + (i + 1) + "."),
                         bX + 4, y + 7, COLOR_DIM);
 
-                ctx.drawCenteredTextWithShadow(textRenderer,
-                        Text.literal(entry.homeName),
+                ctx.drawCenteredString(font,
+                        Component.literal(entry.homeName),
                         bX + bW / 2, y + 7,
                         hov ? 0xFFFFFFFF : COLOR_TEXT);
 
-                ctx.drawTextWithShadow(textRenderer,
-                        Text.literal("§8" + entry.getTimeAgo()),
+                ctx.drawString(font,
+                        Component.literal("§8" + entry.getTimeAgo()),
                         bX + bW - 28, y + 7, COLOR_DIM);
 
                 y += 26;
             }
         }
 
-        int btnY  = panelY + panelH - 22;
-        int bW    = 80;
-        int bH    = 16;
+        int btnY   = panelY + panelH - 22;
+        int bW     = 80;
+        int bH     = 16;
         int clearX = panelX + (panelW / 2) - bW - 4;
         int backX  = panelX + (panelW / 2) + 4;
         boolean clearHov = mouseX >= clearX && mouseX <= clearX + bW
                 && mouseY >= btnY && mouseY <= btnY + bH;
+
         ctx.fill(clearX, btnY, clearX + bW, btnY + bH,
                 clearHov ? 0xFF3A1A1A : COLOR_BTN);
         ctx.fill(clearX, btnY, clearX + bW, btnY + 1,
                 clearHov ? 0xFFAA4444 : COLOR_BORDER);
-        ctx.drawCenteredTextWithShadow(textRenderer,
-                Text.literal(LangManager.getInstance().get("button.clear")),
+        ctx.drawCenteredString(font,
+                Component.literal(LangManager.getInstance().get("button.clear")),
                 clearX + bW / 2, btnY + 4,
                 clearHov ? 0xFFFF6666 : COLOR_DIM);
 
@@ -109,8 +110,8 @@ public class HistoryScreen extends Screen {
                 backHov ? 0xFF1E1E3F : COLOR_BTN);
         ctx.fill(backX, btnY, backX + bW, btnY + 1,
                 backHov ? COLOR_ACCENT : COLOR_BORDER);
-        ctx.drawCenteredTextWithShadow(textRenderer,
-                Text.literal(LangManager.getInstance().get("button.back")),
+        ctx.drawCenteredString(font,
+                Component.literal(LangManager.getInstance().get("button.back")),
                 backX + bW / 2, btnY + 4,
                 backHov ? 0xFFFFFFFF : COLOR_DIM);
 
@@ -136,11 +137,11 @@ public class HistoryScreen extends Screen {
         }
 
         if (mx >= backX && mx <= backX + bW && my >= btnY && my <= btnY + bH) {
-            assert client != null;
-            client.setScreen(parent);
+            assert minecraft != null;
+            minecraft.setScreen(parent);
             return true;
         }
-        
+
         if (hoveredIndex >= 0) {
             List<ModConfig.HistoryEntry> history = ModConfig.getInstance().getHistory();
             if (hoveredIndex < history.size()) {
@@ -158,13 +159,13 @@ public class HistoryScreen extends Screen {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == 256) {
-            assert client != null;
-            client.setScreen(parent);
+            assert minecraft != null;
+            minecraft.setScreen(parent);
             return true;
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public boolean shouldPause() { return false; }
+    public boolean isPauseScreen() { return false; }
 }
