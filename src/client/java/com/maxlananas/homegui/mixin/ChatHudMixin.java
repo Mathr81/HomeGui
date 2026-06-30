@@ -1,6 +1,6 @@
-package com.example.homegui.mixin;
+package com.maxlananas.homegui.mixin;
 
-import com.example.homegui.HomesManager;
+import com.maxlananas.homegui.HomesManager;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
