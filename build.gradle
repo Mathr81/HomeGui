@@ -18,20 +18,28 @@ repositories {
     mavenCentral()
 }
 
-// ===== Gradle 9 / Loom 1.17 compat =====
-// Crée la configuration AVANT le bloc dependencies
-configurations.maybeCreate('modImplementation').extendsFrom(configurations.getByName('implementation'))
-
-// Filtre les sources client dans main (évite splitEnvironmentSourceSets)
-sourceSets.main {
-    java.srcDirs      += 'src/client/java'
-    resources.srcDirs += 'src/client/resources'
-}
-
 loom {
+    splitEnvironmentSourceSets()
+
     mods {
         "homegui" {
             sourceSet sourceSets.main
+            sourceSet sourceSets.client
+        }
+    }
+}
+
+// Gradle 9.x workaround
+configurations.maybeCreate('modImplementation').extendsFrom(configurations.getByName('implementation'))
+
+// FIX: câble modImplementation sur TOUS les classpaths (main + client)
+afterEvaluate {
+    def modImpl = configurations.getByName('modImplementation')
+    ['compileClasspath', 'runtimeClasspath',
+     'clientCompileClasspath', 'clientRuntimeClasspath'].each { name ->
+        def cfg = configurations.findByName(name)
+        if (cfg != null) {
+            cfg.extendsFrom(modImpl)
         }
     }
 }
@@ -43,16 +51,6 @@ dependencies {
     add('modImplementation', "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
 
     implementation 'com.google.code.gson:gson:2.10.1'
-}
-
-// Cable modImplementation sur le classpath de compilation
-afterEvaluate {
-    ['compileClasspath', 'runtimeClasspath'].each { name ->
-        def cfg = configurations.findByName(name)
-        if (cfg != null) {
-            cfg.extendsFrom(configurations.getByName('modImplementation'))
-        }
-    }
 }
 
 processResources {
