@@ -6,13 +6,8 @@ public class LangManager {
         ENGLISH("en", "English"),
         FRENCH("fr", "Français");
 
-        public final String code;
-        public final String displayName;
-
-        Language(String code, String displayName) {
-            this.code = code;
-            this.displayName = displayName;
-        }
+        public final String code, displayName;
+        Language(String code, String displayName) { this.code = code; this.displayName = displayName; }
     }
 
     private static LangManager instance;
@@ -25,7 +20,7 @@ public class LangManager {
         return instance;
     }
 
-    public Language getCurrentLang()       { return currentLang; }
+    public Language getCurrentLang() { return currentLang; }
 
     public void setLanguage(Language lang) {
         currentLang = lang;
@@ -37,34 +32,35 @@ public class LangManager {
     }
 
     public void loadFromConfig() {
-        currentLang = ModConfig.getInstance().getLanguage().equals("fr")
-                ? Language.FRENCH : Language.ENGLISH;
+        currentLang = "fr".equals(ModConfig.getInstance().getLanguage()) ? Language.FRENCH : Language.ENGLISH;
     }
 
     public String get(String key) {
         boolean fr = currentLang == Language.FRENCH;
         return switch (key) {
-            case "title.homes"         -> fr ? "MES HOMES"           : "MY HOMES";
-            case "title.stats"         -> fr ? "STATISTIQUES"        : "STATISTICS";
-            case "title.history"       -> fr ? "HISTORIQUE RECENT"   : "RECENT HISTORY";
-            case "button.refresh"      -> fr ? "Actu."               : "Refresh";
-            case "button.recent"       -> fr ? "Recents"             : "Recent";
-            case "button.close"        -> fr ? "Fermer"              : "Close";
-            case "button.back"         -> fr ? "Retour"              : "Back";
-            case "button.clear"        -> fr ? "Effacer"             : "Clear";
-            case "message.no_homes"    -> fr ? "Aucun home trouve"   : "No homes found";
-            case "message.no_history"  -> fr ? "Aucun historique"    : "No history";
-            case "message.no_results"  -> fr ? "Aucun resultat pour" : "No results for";
-            case "message.loading"     -> fr ? "Chargement..."       : "Loading...";
-            case "message.click_to_tp" -> fr ? "Clic pour TP"        : "Click to TP";
-            case "stats.total_homes"   -> fr ? "homes"               : "homes";
-            case "stats.favorites"     -> fr ? "favoris"             : "favorites";
-            case "stats.total_tp"      -> fr ? "teleports"           : "teleports";
-            case "stats.top_homes"     -> fr ? "Les 5 Meilleurs Home": "TOP 5 HOMES";
-            case "stats.visits"        -> fr ? "visite"              : "visit";
-            case "stats.visits_plural" -> fr ? "visites"             : "visits";
-            case "favorite.right_click"-> fr ? "Clic droit = favori" : "Right click = fav";
-            default                    -> key;
+            case "title.homes"          -> fr ? "MES HOMES"            : "MY HOMES";
+            case "title.stats"          -> fr ? "STATISTIQUES"         : "STATISTICS";
+            case "title.history"        -> fr ? "HISTORIQUE RÉCENT"    : "RECENT HISTORY";
+            case "button.refresh"       -> fr ? "Actualiser"           : "Refresh";
+            case "button.recent"        -> fr ? "Récents"              : "Recent";
+            case "button.close"         -> fr ? "Fermer"               : "Close";
+            case "button.back"          -> fr ? "Retour"               : "Back";
+            case "button.clear"         -> fr ? "Effacer"              : "Clear";
+            case "message.no_homes"     -> fr ? "Aucun home trouvé"    : "No homes found";
+            case "message.no_history"   -> fr ? "Aucun historique"     : "No history yet";
+            case "message.no_results"   -> fr ? "Aucun résultat pour"  : "No results for";
+            case "message.loading"      -> fr ? "Chargement…"          : "Loading…";
+            case "message.click_to_tp"  -> fr ? "Clic = TP"            : "Click = TP";
+            case "message.fav_tip"      -> fr ? "★ Clic droit = favori": "★ Right click = fav";
+            case "stats.total_homes"    -> fr ? "homes"                : "homes";
+            case "stats.favorites"      -> fr ? "favoris"              : "favorites";
+            case "stats.total_tp"       -> fr ? "téléports"            : "teleports";
+            case "stats.top_homes"      -> fr ? "TOP 5 HOMES"          : "TOP 5 HOMES";
+            case "stats.visits"         -> fr ? "visite"               : "visit";
+            case "stats.visits_plural"  -> fr ? "visites"              : "visits";
+            case "hint.search"          -> fr ? "Rechercher…"          : "Search…";
+            case "hint.create_home"     -> fr ? "Tapez /sethome <nom>" : "Use /sethome <name>";
+            default -> key;
         };
     }
 }
