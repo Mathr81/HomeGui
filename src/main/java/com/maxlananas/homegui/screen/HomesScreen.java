@@ -27,8 +27,6 @@ public class HomesScreen extends Screen {
     private final List<String> filtered  = new ArrayList<>();
     private boolean showFavOnly = false;
     private boolean needsRebuild = true;
-
-    // Track rendered home buttons for overlays
     private final List<StyledButton> homeButtons = new ArrayList<>();
     private final List<StyledButton> starButtons = new ArrayList<>();
     private final List<String>       displayedHomes = new ArrayList<>();
@@ -72,14 +70,10 @@ public class HomesScreen extends Screen {
         int panelX = width / 2 - PANEL_W / 2;
         int searchW = PANEL_W - PAD * 2 - 26;
         int searchY = 50;
-
-        // ── Search box ────────────────────────────
         searchBox = new EditBox(font, panelX + PAD, searchY, searchW, 16, Component.literal("Search"));
         searchBox.setValue(savedSearch);
         searchBox.setResponder(t -> { savedSearch = t; needsRebuild = true; });
         addRenderableWidget(searchBox);
-
-        // ── Favorite filter toggle ────────────────
         addRenderableWidget(new StyledButton(
                 panelX + PAD + searchW + 4, searchY, 22, 16,
                 showFavOnly ? "★" : "☆",
@@ -89,8 +83,7 @@ public class HomesScreen extends Screen {
                 showFavOnly ? Theme.GOLD : Theme.BORDER,
                 showFavOnly ? Theme.GOLD : Theme.DIM,
                 showFavOnly ? Theme.GOLD : Theme.TEXT));
-
-        // ── Home list ─────────────────────────────
+        
         applyFilter();
         int listY = searchY + 24;
         int mainBtnW = PANEL_W - PAD * 2 - 28;
@@ -100,7 +93,6 @@ public class HomesScreen extends Screen {
             final String home = filtered.get(i);
             int btnY = listY + i * 24;
 
-            // Home button
             StyledButton homeBtn = new StyledButton(panelX + PAD, btnY, mainBtnW, 20, home,
                     () -> {
                         ModConfig.getInstance().incrementUseCount(home);
@@ -111,7 +103,6 @@ public class HomesScreen extends Screen {
             homeButtons.add(homeBtn);
             displayedHomes.add(home);
 
-            // Star toggle
             boolean isFav = ModConfig.getInstance().isFavorite(home);
             StyledButton starBtn = new StyledButton(
                     panelX + PAD + mainBtnW + 4, btnY, 22, 20,
@@ -125,8 +116,7 @@ public class HomesScreen extends Screen {
             addRenderableWidget(starBtn);
             starButtons.add(starBtn);
         }
-
-        // ── Bottom nav buttons ────────────────────
+        
         int panelH = height - 50;
         int bottomY = 20 + panelH - 24;
         int bW = 60, gap = 6;
@@ -154,34 +144,26 @@ public class HomesScreen extends Screen {
         LangManager L = LangManager.getInstance();
         Font f = font;
 
-        // Full background
         g.fill(0, 0, width, height, Theme.BG);
 
         int panelX = width / 2 - PANEL_W / 2;
         int panelY = 20;
         int panelH = height - 50;
 
-        // Panel
         Theme.drawPanel(g, panelX, panelY, PANEL_W, panelH);
 
-        // Title
         Theme.drawTextCentered(g, f, "✦ " + L.get("title.homes") + " ✦",
                 width / 2, panelY + 10, Theme.ACCENT);
-
-        // Subtitle: home count
+        
         Theme.drawTextCentered(g, f, "§8" + allHomes.size() + " " + L.get("stats.total_homes"),
                 width / 2, panelY + 24, Theme.DIM);
 
-        // Search hint (when empty and unfocused)
         if (searchBox != null && searchBox.getValue().isEmpty() && !searchBox.isFocused()) {
             g.drawString(f, Component.literal("§7" + L.get("hint.search")),
                     searchBox.getX() + 4, searchBox.getY() + 4, Theme.FAINT);
         }
 
-        // Separator
         Theme.drawSeparator(g, panelX + PAD, 46, PANEL_W - PAD * 2);
-
-        // Empty state
         if (filtered.isEmpty()) {
             int cy = 120;
             if (allHomes.isEmpty()) {
@@ -193,12 +175,8 @@ public class HomesScreen extends Screen {
             }
         }
 
-        // ── Render all widgets (buttons, search box) ──
         super.render(g, mouseX, mouseY, delta);
 
-        // ── Overlays drawn ON TOP of widgets ──────
-
-        // Gold left accent on favorite home buttons + use count
         for (int i = 0; i < homeButtons.size(); i++) {
             StyledButton btn = homeButtons.get(i);
             String home = displayedHomes.get(i);
@@ -216,7 +194,6 @@ public class HomesScreen extends Screen {
             }
         }
 
-        // Separator above bottom buttons
         int bottomY = 20 + panelH - 24;
         Theme.drawSeparator(g, panelX + PAD, bottomY - 8, PANEL_W - PAD * 2);
     }
