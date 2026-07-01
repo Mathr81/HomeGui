@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 public class HomeGuiClient implements ClientModInitializer {
 
     public static final Logger LOGGER = LoggerFactory.getLogger("homegui");
-
     private static KeyMapping openGuiKey;
 
     @Override
