@@ -3,8 +3,9 @@ package com.maxlananas.homegui.screen;
 import com.maxlananas.homegui.HomesManager;
 import com.maxlananas.homegui.config.LangManager;
 import com.maxlananas.homegui.config.ModConfig;
-import com.maxlananas.homegui.ui.UIRenderer;
-import com.maxlananas.homegui.ui.UITheme;
+import com.maxlananas.homegui.widget.StyledButton;
+import com.maxlananas.homegui.widget.Theme;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -13,11 +14,10 @@ import java.util.List;
 
 public class HistoryScreen extends Screen {
 
-    private final Screen parent;
-    private int hoveredIndex = -1;
+    private static final int PANEL_W = 280;
 
-    private int panelX, panelY, panelW, panelH;
-    private int listX, listY, listW;
+    private final Screen parent;
+    private boolean needsRebuild = true;
 
     public HistoryScreen(Screen parent) {
         super(Component.literal("History"));
@@ -25,135 +25,89 @@ public class HistoryScreen extends Screen {
     }
 
     @Override
-    protected void init() {
-        panelW = Math.min(UITheme.PANEL_W - 20, width - 40);
-        panelH = Math.min(height - 40, 300);
-        panelX = (width  - panelW) / 2;
-        panelY = (height - panelH) / 2;
-        listX  = panelX + UITheme.PAD;
-        listY  = panelY + UITheme.HEADER_H + 6;
-        listW  = panelW - UITheme.PAD * 2;
+    protected void init() { needsRebuild = true; }
+
+    @Override
+    public void tick() {
+        if (needsRebuild) { needsRebuild = false; rebuildUI(); }
+    }
+
+    private void rebuildUI() {
+        clearWidgets();
+        LangManager L = LangManager.getInstance();
+
+        int panelX = width / 2 - PANEL_W / 2;
+        int pad = 12;
+        int listY = 52;
+
+        List<ModConfig.HistoryEntry> history = ModConfig.getInstance().getHistory();
+        int max = Math.min(history.size(), 12);
+
+        for (int i = 0; i < max; i++) {
+            final ModConfig.HistoryEntry entry = history.get(i);
+            int y = listY + i * 26;
+            String label = (i + 1) + ". " + entry.homeName;
+
+            addRenderableWidget(new StyledButton(panelX + pad, y, PANEL_W - pad * 2 - 50, 22, label,
+                    () -> {
+                        ModConfig.getInstance().incrementUseCount(entry.homeName);
+                        ModConfig.getInstance().addToHistory(entry.homeName);
+                        HomesManager.getInstance().teleportToHome(entry.homeName);
+                    }));
+
+            // Time ago label (non-clickable, drawn in render)
+        }
+
+        int panelH = height - 50;
+        int btnY = 20 + panelH - 24;
+        int bW = 90;
+        int clearX = panelX + (PANEL_W / 2) - bW - 6;
+        int backX  = panelX + (PANEL_W / 2) + 6;
+
+        addRenderableWidget(new StyledButton(clearX, btnY, bW, 18, L.get("button.clear"),
+                () -> { ModConfig.getInstance().clearHistory(); needsRebuild = true; },
+                Theme.BTN, 0xFF3A1A1A, Theme.DANGER, Theme.DIM, Theme.DANGER));
+
+        addRenderableWidget(new StyledButton(backX, btnY, bW, 18, L.get("button.back"),
+                () -> { if (minecraft != null) minecraft.setScreen(parent); }));
     }
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float delta) {
-        UIRenderer.drawBackground(g, width, height);
-        UIRenderer.drawPanel(g, panelX, panelY, panelW, panelH);
+        LangManager L = LangManager.getInstance();
+        Font f = font;
 
-        UIRenderer.drawHeader(g, panelX, panelY, panelW, UITheme.HEADER_H);
-        UIRenderer.drawTitle(g, font,
-                "[ " + LangManager.getInstance().get("title.history") + " ]",
-                panelX + panelW / 2, panelY + 8, UITheme.ACCENT_TITLE);
+        g.fill(0, 0, width, height, Theme.BG);
 
+        int panelX = width / 2 - PANEL_W / 2;
+        int panelY = 20;
+        int panelH = height - 50;
+
+        Theme.drawPanel(g, panelX, panelY, PANEL_W, panelH);
+        Theme.drawTextCentered(g, f, "⟳ " + L.get("title.history"),
+                width / 2, panelY + 10, Theme.ACCENT);
+
+        // Time ago overlays
         List<ModConfig.HistoryEntry> history = ModConfig.getInstance().getHistory();
-        hoveredIndex = -1;
-
-        if (history.isEmpty()) {
-            String msg = LangManager.getInstance().get("message.no_history");
-            g.drawString(font, Component.literal(msg),
-                    panelX + panelW / 2 - font.width(msg) / 2,
-                    panelY + panelH / 2 - 4,
-                    UITheme.TEXT_DIM, false);
-        } else {
-            int max = Math.min(history.size(), 10);
-            for (int i = 0; i < max; i++) {
-                ModConfig.HistoryEntry entry = history.get(i);
-                int rowY = listY + i * (UITheme.ROW_H + UITheme.ROW_GAP);
-
-                boolean hovered = mouseX >= listX && mouseX <= listX + listW
-                               && mouseY >= rowY  && mouseY <= rowY + UITheme.ROW_H;
-                if (hovered) hoveredIndex = i;
-
-                UIRenderer.drawRow(g, listX, rowY, listW, UITheme.ROW_H, hovered, false);
-
-                String num = (i + 1) + ".";
-                g.drawString(font, Component.literal(num),
-                        listX + 4, rowY + 7, UITheme.TEXT_DIM, false);
-
-                g.drawString(font, Component.literal(entry.homeName),
-                        listX + 20, rowY + 7,
-                        hovered ? UITheme.TEXT_PRIMARY : 0xFFCCCCEE, false);
-
-                String ago = entry.getTimeAgo();
-                g.drawString(font, Component.literal(ago),
-                        listX + listW - font.width(ago) - 6,
-                        rowY + 7, UITheme.TEXT_DIM, false);
-            }
+        int listY = 52;
+        int pad = 12;
+        for (int i = 0; i < Math.min(history.size(), 12); i++) {
+            ModConfig.HistoryEntry e = history.get(i);
+            int y = listY + i * 26;
+            g.drawString(f, Component.literal("§8" + e.getTimeAgo()),
+                    panelX + PANEL_W - pad - 44, y + 7, Theme.FAINT);
         }
 
-        renderFooter(g, mouseX, mouseY);
+        if (history.isEmpty()) {
+            Theme.drawTextCentered(g, f, "§7☁  " + L.get("message.no_history"),
+                    width / 2, panelY + 80, Theme.DIM);
+        }
+
         super.render(g, mouseX, mouseY, delta);
     }
 
-    private void renderFooter(GuiGraphics g, int mouseX, int mouseY) {
-        int footerY = panelY + panelH - UITheme.FOOTER_H;
-        UIRenderer.drawFooter(g, panelX, footerY, panelW, UITheme.FOOTER_H);
-
-        LangManager lang = LangManager.getInstance();
-        String[] labels  = { lang.get("button.clear"), lang.get("button.back") };
-        int btnW         = 70;
-        int totalW       = btnW * 2 + 8;
-        int startX       = panelX + (panelW - totalW) / 2;
-        int btnY         = footerY + (UITheme.FOOTER_H - 14) / 2;
-
-        for (int i = 0; i < 2; i++) {
-            int     bx = startX + i * (btnW + 8);
-            boolean bh = mouseX >= bx && mouseX <= bx + btnW
-                      && mouseY >= btnY && mouseY <= btnY + 14;
-
-            g.fill(bx, btnY, bx + btnW, btnY + 14,
-                    bh ? UITheme.BTN_BG_HOVER : UITheme.BTN_BG);
-            UIRenderer.drawBorder(g, bx, btnY, btnW, 14,
-                    bh ? UITheme.ACCENT_PRIMARY : UITheme.BTN_BORDER);
-
-            String lbl = labels[i];
-            g.drawString(font, Component.literal(lbl),
-                    bx + btnW / 2 - font.width(lbl) / 2, btnY + 3,
-                    bh ? UITheme.ACCENT_TITLE : UITheme.TEXT_DIM, false);
-        }
-    }
-
     @Override
-    public boolean mouseClicked(double mx, double my, int btn) {
-        int mouseX = (int) mx;
-        int mouseY = (int) my;
-
-        if (btn == 0 && hoveredIndex >= 0) {
-            List<ModConfig.HistoryEntry> history = ModConfig.getInstance().getHistory();
-            if (hoveredIndex < history.size()) {
-                String home = history.get(hoveredIndex).homeName;
-                ModConfig.getInstance().incrementUseCount(home);
-                ModConfig.getInstance().addToHistory(home);
-                HomesManager.getInstance().teleportToHome(home);
-                return true;
-            }
-        }
-
-        int footerY = panelY + panelH - UITheme.FOOTER_H;
-        int btnW    = 70;
-        int startX  = panelX + (panelW - (btnW * 2 + 8)) / 2;
-        int btnY    = footerY + (UITheme.FOOTER_H - 14) / 2;
-
-        if (btn == 0 && mouseY >= btnY && mouseY <= btnY + 14) {
-            int bx0 = startX;
-            if (mouseX >= bx0 && mouseX <= bx0 + btnW) {
-                ModConfig.getInstance().clearHistory();
-                return true;
-            }
-            int bx1 = startX + btnW + 8;
-            if (mouseX >= bx1 && mouseX <= bx1 + btnW) {
-                if (minecraft != null) minecraft.setScreen(parent);
-                return true;
-            }
-        }
-
-        return super.mouseClicked(mx, my, btn);
-    }
-
-    @Override
-    public void onClose() {
-        if (minecraft != null) minecraft.setScreen(parent);
-    }
+    public void onClose() { if (minecraft != null) minecraft.setScreen(parent); }
 
     @Override
     public boolean isPauseScreen() { return false; }
