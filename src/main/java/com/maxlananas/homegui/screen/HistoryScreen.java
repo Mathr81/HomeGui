@@ -54,8 +54,6 @@ public class HistoryScreen extends Screen {
                         ModConfig.getInstance().addToHistory(entry.homeName);
                         HomesManager.getInstance().teleportToHome(entry.homeName);
                     }));
-
-            // Time ago label (non-clickable, drawn in render)
         }
 
         int panelH = height - 50;
@@ -87,7 +85,6 @@ public class HistoryScreen extends Screen {
         Theme.drawTextCentered(g, f, "⟳ " + L.get("title.history"),
                 width / 2, panelY + 10, Theme.ACCENT);
 
-        // Time ago overlays
         List<ModConfig.HistoryEntry> history = ModConfig.getInstance().getHistory();
         int listY = 52;
         int pad = 12;
