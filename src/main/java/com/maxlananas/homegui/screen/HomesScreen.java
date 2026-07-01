@@ -4,6 +4,8 @@ import com.maxlananas.homegui.HomesManager;
 import com.maxlananas.homegui.config.LangManager;
 import com.maxlananas.homegui.config.ModConfig;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.events.KeyEvent;
+import net.minecraft.client.gui.components.events.MouseButtonEvent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -61,6 +63,13 @@ public class HomesScreen extends Screen {
         scrollOffset = 0;
     }
 
+    private void drawOutline(GuiGraphics ctx, int x, int y, int w, int h, int color) {
+        ctx.fill(x, y, x + w, y + 1, color);
+        ctx.fill(x, y + h - 1, x + w, y + h, color);
+        ctx.fill(x, y, x + 1, y + h, color);
+        ctx.fill(x + w - 1, y, x + w, y + h, color);
+    }
+
     @Override
     public void render(GuiGraphics ctx, int mouseX, int mouseY, float delta) {
         ctx.fill(0, 0, width, height, COLOR_BG);
@@ -81,10 +90,10 @@ public class HomesScreen extends Screen {
 
         ctx.fill(searchX, searchY, searchX + searchW, searchY + 16,
                 searchFocused ? 0xFF1A1A4A : 0xFF111130);
-        ctx.renderOutline(searchX, searchY, searchW, 16,
+        drawOutline(ctx, searchX, searchY, searchW, 16,
                 searchFocused ? COLOR_ACCENT : COLOR_BORDER);
         String searchDisplay = searchQuery.isEmpty() && !searchFocused
-                ? "§7\u1F50D Search..."
+                ? "§7\uD83D\uDD0D Search..."
                 : "§f" + searchQuery + (searchFocused ? "§7|" : "");
         ctx.drawString(font, Component.literal(searchDisplay),
                 searchX + 4, searchY + 4, COLOR_TEXT);
@@ -94,7 +103,7 @@ public class HomesScreen extends Screen {
                 && mouseY >= searchY && mouseY <= searchY + 16;
         ctx.fill(favBtnX, searchY, favBtnX + 22, searchY + 16,
                 showFavoritesOnly ? 0xFF3A2A00 : (favBtnHover ? COLOR_BTN_HOVER : COLOR_BTN));
-        ctx.renderOutline(favBtnX, searchY, 22, 16,
+        drawOutline(ctx, favBtnX, searchY, 22, 16,
                 showFavoritesOnly ? COLOR_FAV : COLOR_BORDER);
         ctx.drawCenteredString(font, Component.literal("★"),
                 favBtnX + 11, searchY + 4,
@@ -130,7 +139,7 @@ public class HomesScreen extends Screen {
                 if (hovered) hoveredIndex = idx;
                 int bgColor = hovered ? COLOR_ACCENT_HOVER : COLOR_BTN;
                 ctx.fill(btnX, btnY, btnX + btnW, btnY + BUTTON_H, bgColor);
-                ctx.renderOutline(btnX, btnY, btnW, BUTTON_H,
+                drawOutline(ctx, btnX, btnY, btnW, BUTTON_H,
                         isFav ? COLOR_FAV : (hovered ? COLOR_ACCENT : COLOR_BORDER));
                 if (isFav) {
                     ctx.drawString(font, Component.literal("★"),
@@ -162,10 +171,16 @@ public class HomesScreen extends Screen {
             String h = filtered.get(hoveredIndex);
             String tip = LangManager.getInstance().get("message.click_to_tp") + " | "
                     + LangManager.getInstance().get("favorite.right_click");
-            ctx.renderTooltip(font, List.of(
-                    Component.literal("§b" + h),
-                    Component.literal("§7" + tip)
-            ), mouseX, mouseY);
+            String line1 = "§b" + h;
+            String line2 = "§7" + tip;
+            int tw = Math.max(font.width(line1), font.width(line2)) + 8;
+            int th = 24;
+            int tx = Math.min(mouseX + 12, width - tw - 4);
+            int ty = Math.max(mouseY - 12, 4);
+            ctx.fill(tx - 3, ty - 3, tx + tw + 3, ty + th + 3, 0xF0100010);
+            drawOutline(ctx, tx - 3, ty - 3, tw + 6, th + 6, COLOR_ACCENT);
+            ctx.drawString(font, Component.literal(line1), tx, ty + 2, 0xFFFFFF);
+            ctx.drawString(font, Component.literal(line2), tx, ty + 13, 0xAAAAAA);
         }
 
         super.render(ctx, mouseX, mouseY, delta);
@@ -207,7 +222,7 @@ public class HomesScreen extends Screen {
                     && mouseY >= bottomBtnY && mouseY <= bottomBtnY + bH;
             ctx.fill(xs[i], bottomBtnY, xs[i] + bW, bottomBtnY + bH,
                     hov ? COLOR_BTN_HOVER : COLOR_BTN);
-            ctx.renderOutline(xs[i], bottomBtnY, bW, bH,
+            drawOutline(ctx, xs[i], bottomBtnY, bW, bH,
                     hov ? COLOR_ACCENT : COLOR_BORDER);
             ctx.drawCenteredString(font, Component.literal(labels[i]),
                     xs[i] + bW / 2, bottomBtnY + 4,
@@ -216,8 +231,8 @@ public class HomesScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int mx = (int) mouseX, my = (int) mouseY;
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        int mx = (int) event.x(), my = (int) event.y();
         int panelX  = width / 2 - 140;
         int panelW  = 280;
         int panelY  = 20;
@@ -242,7 +257,7 @@ public class HomesScreen extends Screen {
 
         if (hoveredIndex >= 0 && hoveredIndex < filtered.size()) {
             String home = filtered.get(hoveredIndex);
-            if (button == 1) {
+            if (event.button() == 1) {
                 ModConfig.getInstance().toggleFavorite(home);
             } else {
                 ModConfig.getInstance().incrementUseCount(home);
@@ -277,17 +292,17 @@ public class HomesScreen extends Screen {
             }
         }
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == 256) {
+    public boolean keyPressed(KeyEvent event) {
+        if (event.key() == 256) {
             assert minecraft != null;
             minecraft.setScreen(null);
             return true;
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(event);
     }
 
     @Override
