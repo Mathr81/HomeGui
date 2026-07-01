@@ -4,8 +4,6 @@ import com.maxlananas.homegui.HomesManager;
 import com.maxlananas.homegui.config.LangManager;
 import com.maxlananas.homegui.config.ModConfig;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.events.KeyEvent;
-import net.minecraft.client.gui.components.events.MouseButtonEvent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -37,7 +35,7 @@ public class HomesScreen extends Screen {
     private int    scrollOffset             = 0;
     private boolean showFavoritesOnly       = false;
 
-    private int btnHistoryX, btnStatsX, btnRefreshX, btnFavX, btnCloseX;
+    private int btnHistoryX, btnStatsX, btnRefreshX, btnCloseX;
     private int bottomBtnY;
 
     public HomesScreen() {
@@ -231,12 +229,11 @@ public class HomesScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        int mx = (int) event.x(), my = (int) event.y();
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        int mx = (int) mouseX, my = (int) mouseY;
         int panelX  = width / 2 - 140;
         int panelW  = 280;
         int panelY  = 20;
-        int panelH  = height - 50;
         int searchY = panelY + 26;
         int searchX = panelX + PANEL_PAD;
         int searchW = panelW - PANEL_PAD * 2 - 28;
@@ -257,7 +254,7 @@ public class HomesScreen extends Screen {
 
         if (hoveredIndex >= 0 && hoveredIndex < filtered.size()) {
             String home = filtered.get(hoveredIndex);
-            if (event.button() == 1) {
+            if (button == 1) {
                 ModConfig.getInstance().toggleFavorite(home);
             } else {
                 ModConfig.getInstance().incrementUseCount(home);
@@ -292,17 +289,17 @@ public class HomesScreen extends Screen {
             }
         }
 
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
-        if (event.key() == 256) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
             assert minecraft != null;
             minecraft.setScreen(null);
             return true;
         }
-        return super.keyPressed(event);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
