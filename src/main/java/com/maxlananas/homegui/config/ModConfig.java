@@ -12,8 +12,10 @@ public class ModConfig {
 
     private static ModConfig instance;
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Path CONFIG_PATH =
-            FabricLoader.getInstance().getConfigDir().resolve("homegui.json");
+
+    private static Path getConfigPath() {
+        return FabricLoader.getInstance().getConfigDir().resolve("homegui.json");
+    }
 
     private int     themeIndex     = 0;
     private boolean compactMode    = false;
@@ -33,10 +35,11 @@ public class ModConfig {
 
     public String  getLanguage()           { return language; }
     public void    setLanguage(String l)   { language = l; save(); }
-    public int  getThemeIndex()        { return themeIndex; }
-    public void setThemeIndex(int idx) { themeIndex = idx; save(); }
+    public int     getThemeIndex()         { return themeIndex; }
+    public void    setThemeIndex(int idx)  { themeIndex = idx; save(); }
     public boolean isCompactMode()         { return compactMode; }
     public void    setCompactMode(boolean c) { compactMode = c; save(); }
+
     public boolean isFavorite(String home) {
         return favorites.contains(home.toLowerCase());
     }
@@ -58,8 +61,9 @@ public class ModConfig {
         save();
     }
 
-    public int getTotalTeleports()       { return totalTeleports; }
+    public int getTotalTeleports()             { return totalTeleports; }
     public Map<String,Integer> getAllUseCounts() { return new HashMap<>(useCounts); }
+
     public void addToHistory(String home) {
         history.removeIf(e -> e.homeName.equalsIgnoreCase(home));
         history.add(0, new HistoryEntry(home, System.currentTimeMillis()));
@@ -69,6 +73,7 @@ public class ModConfig {
 
     public List<HistoryEntry> getHistory()  { return new ArrayList<>(history); }
     public void clearHistory()              { history.clear(); save(); }
+
     private void save() {
         try {
             JsonObject json = new JsonObject();
@@ -94,17 +99,18 @@ public class ModConfig {
             }
             json.add("history", histArr);
 
-            Files.writeString(CONFIG_PATH, GSON.toJson(json));
+            Files.writeString(getConfigPath(), GSON.toJson(json));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     private void load() {
-        if (!Files.exists(CONFIG_PATH)) return;
+        Path path = getConfigPath();
+        if (!Files.exists(path)) return;
         try {
             JsonObject json = JsonParser.parseString(
-                    Files.readString(CONFIG_PATH)).getAsJsonObject();
+                    Files.readString(path)).getAsJsonObject();
 
             if (json.has("themeIndex"))     themeIndex     = json.get("themeIndex").getAsInt();
             if (json.has("compactMode"))    compactMode    = json.get("compactMode").getAsBoolean();
@@ -149,9 +155,10 @@ public class ModConfig {
         themeIndex = 0; compactMode = false; language = "en";
         totalTeleports = 0;
         favorites.clear(); useCounts.clear(); history.clear();
-        try { Files.deleteIfExists(CONFIG_PATH); } catch (IOException ignored) {}
+        try { Files.deleteIfExists(getConfigPath()); } catch (IOException ignored) {}
         save();
     }
+
     public static class HistoryEntry {
         public String homeName;
         public long   timestamp;
@@ -168,9 +175,9 @@ public class ModConfig {
 
         public String getTimeAgo() {
             long s = (System.currentTimeMillis() - timestamp) / 1000;
-            if (s < 60)          return s + "s";
-            if (s < 3600)        return (s / 60) + "m";
-            if (s < 86400)       return (s / 3600) + "h";
+            if (s < 60)    return s + "s";
+            if (s < 3600)  return (s / 60) + "m";
+            if (s < 86400) return (s / 3600) + "h";
             return (s / 86400) + "d";
         }
     }
