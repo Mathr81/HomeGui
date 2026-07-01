@@ -45,7 +45,7 @@ public class HomesScreen extends Screen {
     public void tick() {
         if (needsRebuild) {
             needsRebuild = false;
-            rebuildWidgets();
+            rebuildUI();
         }
     }
 
@@ -59,7 +59,7 @@ public class HomesScreen extends Screen {
         }
     }
 
-    private void rebuildWidgets() {
+    private void rebuildUI() {
         String prevQuery = (searchBox != null) ? searchBox.getValue() : "";
         clearWidgets();
 
