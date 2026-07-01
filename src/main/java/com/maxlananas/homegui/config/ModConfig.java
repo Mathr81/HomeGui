@@ -12,8 +12,6 @@ public class ModConfig {
 
     private static ModConfig instance;
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-
-    /** Lazy — avoids crash if called before Fabric is ready. */
     private static Path getConfigPath() {
         return FabricLoader.getInstance().getConfigDir().resolve("homegui.json");
     }
@@ -33,8 +31,6 @@ public class ModConfig {
         if (instance == null) instance = new ModConfig();
         return instance;
     }
-
-    // ── Getters / Setters ────────────────────────
 
     public String  getLanguage()              { return language; }
     public void    setLanguage(String l)      { language = l; save(); }
@@ -71,8 +67,6 @@ public class ModConfig {
 
     public List<HistoryEntry> getHistory()    { return new ArrayList<>(history); }
     public void clearHistory()                { history.clear(); save(); }
-
-    // ── Persistence ──────────────────────────────
 
     private void save() {
         try {
@@ -150,8 +144,6 @@ public class ModConfig {
         try { Files.deleteIfExists(getConfigPath()); } catch (IOException ignored) {}
         save();
     }
-
-    // ── Inner class ──────────────────────────────
 
     public static class HistoryEntry {
         public String homeName;
