@@ -38,7 +38,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build
-        run: ./gradlew build --parallel --build-cache --configuration-cache --no-daemon
+        run: ./gradlew build --parallel --build-cache --no-daemon
 
       - name: Generate commit log
         id: changelog
