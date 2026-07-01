@@ -6,29 +6,24 @@ import com.maxlananas.homegui.config.ModConfig;
 import com.maxlananas.homegui.ui.UIRenderer;
 import com.maxlananas.homegui.ui.UITheme;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.client.MouseButtonEvent;
-import net.minecraft.client.KeyEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class HomesScreen extends Screen {
 
-    // ── Données ───────────────────────────────────────────────────────────
     private final List<String> allHomes = new ArrayList<>();
     private final List<String> filtered = new ArrayList<>();
 
-    // ── UI State ──────────────────────────────────────────────────────────
     private EditBox searchBox;
     private boolean showFavOnly  = false;
     private int     scrollOffset = 0;
     private int     hoveredIndex = -1;
     private long    openTime;
 
-    // ── Layout ────────────────────────────────────────────────────────────
     private int panelX, panelY, panelW, panelH;
     private int listX, listY, listW, listH;
     private int maxVisible;
@@ -36,10 +31,6 @@ public class HomesScreen extends Screen {
     public HomesScreen() {
         super(Component.literal("HomeGUI"));
     }
-
-    // ─────────────────────────────────────────────────────────────────────
-    // INIT
-    // ─────────────────────────────────────────────────────────────────────
 
     @Override
     protected void init() {
@@ -59,7 +50,6 @@ public class HomesScreen extends Screen {
         allHomes.clear();
         allHomes.addAll(HomesManager.getInstance().getHomes());
 
-        // SearchBox
         String prevQuery = (searchBox != null) ? searchBox.getValue() : "";
         int sbY = panelY + UITheme.HEADER_H + 4;
         int sbW = panelW - UITheme.PAD * 2 - 24;
@@ -78,14 +68,9 @@ public class HomesScreen extends Screen {
         applyFilter();
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // LOGIQUE
-    // ─────────────────────────────────────────────────────────────────────
-
     private void applyFilter() {
         filtered.clear();
-        String q = (searchBox != null)
-                ? searchBox.getValue().toLowerCase().trim() : "";
+        String q = (searchBox != null) ? searchBox.getValue().toLowerCase().trim() : "";
         ModConfig cfg = ModConfig.getInstance();
 
         List<String> favs   = new ArrayList<>();
@@ -115,10 +100,6 @@ public class HomesScreen extends Screen {
         applyFilter();
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // RENDU
-    // ─────────────────────────────────────────────────────────────────────
-
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float delta) {
         UIRenderer.drawBackground(g, width, height);
@@ -133,7 +114,7 @@ public class HomesScreen extends Screen {
     private void renderHeader(GuiGraphics g) {
         UIRenderer.drawHeader(g, panelX, panelY, panelW, UITheme.HEADER_H);
         UIRenderer.drawTitle(g, font,
-                "Home  " + LangManager.getInstance().get("title.homes"),
+                "[ " + LangManager.getInstance().get("title.homes") + " ]",
                 panelX + panelW / 2, panelY + 8, UITheme.ACCENT_TITLE);
 
         String badge = filtered.size() + "/" + allHomes.size();
@@ -197,10 +178,10 @@ public class HomesScreen extends Screen {
         int endIdx    = Math.min(filtered.size(), scrollOffset + maxVisible);
 
         for (int i = scrollOffset; i < endIdx; i++) {
-            String  home   = filtered.get(i);
-            boolean isFav  = cfg.isFavorite(home);
-            int     uses   = cfg.getUseCount(home);
-            int     rowY   = listY + (i - scrollOffset) * (UITheme.ROW_H + UITheme.ROW_GAP);
+            String  home  = filtered.get(i);
+            boolean isFav = cfg.isFavorite(home);
+            int     uses  = cfg.getUseCount(home);
+            int     rowY  = listY + (i - scrollOffset) * (UITheme.ROW_H + UITheme.ROW_GAP);
 
             boolean hovered = mouseX >= listX && mouseX <= listX + listW
                            && mouseY >= rowY  && mouseY <= rowY + UITheme.ROW_H;
@@ -208,19 +189,16 @@ public class HomesScreen extends Screen {
 
             UIRenderer.drawRow(g, listX, rowY, listW, UITheme.ROW_H, hovered, isFav);
 
-            // Icône favori
             g.drawString(font,
                     Component.literal(isFav ? "*" : "-"),
                     listX + 5, rowY + 7,
                     isFav ? UITheme.COLOR_GOLD : UITheme.TEXT_DISABLED, false);
 
-            // Nom
             String truncated = truncate(home, listW - 60);
             g.drawString(font, Component.literal(truncated),
                     listX + 16, rowY + 7,
                     hovered ? UITheme.TEXT_PRIMARY : 0xFFCCCCEE, false);
 
-            // Compteur
             if (uses > 0) {
                 String useTxt = "x" + uses;
                 g.drawString(font, Component.literal(useTxt),
@@ -229,7 +207,6 @@ public class HomesScreen extends Screen {
             }
         }
 
-        // Scrollbar
         if (maxScroll > 0) {
             UIRenderer.drawScrollbar(g,
                     listX + listW + 2, listY, listH,
@@ -241,18 +218,18 @@ public class HomesScreen extends Screen {
         int footerY = panelY + panelH - UITheme.FOOTER_H;
         UIRenderer.drawFooter(g, panelX, footerY, panelW, UITheme.FOOTER_H);
 
-        LangManager lang  = LangManager.getInstance();
-        String[] labels   = {
+        LangManager lang = LangManager.getInstance();
+        String[] labels  = {
             lang.get("button.refresh"),
             lang.get("button.recent"),
             "Stats",
             lang.get("button.close")
         };
-        int btnW   = (panelW - UITheme.PAD * 2 - 3 * 4) / 4;
-        int btnY   = footerY + (UITheme.FOOTER_H - 14) / 2;
+        int btnW = (panelW - UITheme.PAD * 2 - 3 * 4) / 4;
+        int btnY = footerY + (UITheme.FOOTER_H - 14) / 2;
 
         for (int i = 0; i < labels.length; i++) {
-            int bx  = panelX + UITheme.PAD + i * (btnW + 4);
+            int bx = panelX + UITheme.PAD + i * (btnW + 4);
             boolean bh = mouseX >= bx && mouseX <= bx + btnW
                       && mouseY >= btnY && mouseY <= btnY + 14;
 
@@ -268,19 +245,11 @@ public class HomesScreen extends Screen {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────
-    // INPUTS — API 1.21.10
-    // ─────────────────────────────────────────────────────────────────────
-
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean consumed) {
-        if (consumed) return super.mouseClicked(event, true);
+    public boolean mouseClicked(double mx, double my, int btn) {
+        int mouseX = (int) mx;
+        int mouseY = (int) my;
 
-        int mouseX = (int) event.x();
-        int mouseY = (int) event.y();
-        int btn    = event.button();
-
-        // Clic sur un home
         if (hoveredIndex >= 0 && hoveredIndex < filtered.size()) {
             String home = filtered.get(hoveredIndex);
             if (btn == 0) {
@@ -295,7 +264,6 @@ public class HomesScreen extends Screen {
             }
         }
 
-        // Clic sur le bouton favori (searchbar)
         int sbY     = panelY + UITheme.HEADER_H + 4;
         int sbW     = panelW - UITheme.PAD * 2 - 24;
         int favBtnX = listX + sbW + 4;
@@ -308,7 +276,6 @@ public class HomesScreen extends Screen {
             return true;
         }
 
-        // Clic sur les boutons du footer
         int footerY = panelY + panelH - UITheme.FOOTER_H;
         int btnW    = (panelW - UITheme.PAD * 2 - 3 * 4) / 4;
         int btnY    = footerY + (UITheme.FOOTER_H - 14) / 2;
@@ -323,7 +290,7 @@ public class HomesScreen extends Screen {
             }
         }
 
-        return super.mouseClicked(event, false);
+        return super.mouseClicked(mx, my, btn);
     }
 
     private void handleFooterClick(int index) {
@@ -339,24 +306,19 @@ public class HomesScreen extends Screen {
     @Override
     public boolean mouseScrolled(double mx, double my, double hScroll, double vScroll) {
         int maxScroll = Math.max(0, filtered.size() - maxVisible);
-        scrollOffset  = Math.max(0,
-                Math.min(maxScroll, scrollOffset - (int) Math.signum(vScroll)));
+        scrollOffset  = Math.max(0, Math.min(maxScroll,
+                scrollOffset - (int) Math.signum(vScroll)));
         return true;
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
-        // ESC
-        if (event.key() == 256) {
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
             onClose();
             return true;
         }
-        return super.keyPressed(event);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
-
-    // ─────────────────────────────────────────────────────────────────────
-    // UTILITAIRES
-    // ─────────────────────────────────────────────────────────────────────
 
     private String truncate(String text, int maxW) {
         if (font.width(text) <= maxW) return text;
