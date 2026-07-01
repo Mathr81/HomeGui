@@ -27,7 +27,7 @@ public class HomeGuiClient implements ClientModInitializer {
                 "key.homegui.open_gui",
                 InputConstants.Type.KEYSYM,
                 GLFW.GLFW_KEY_H,
-                "category.homegui.main"
+                new KeyMapping.Category("category.homegui.main")
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
