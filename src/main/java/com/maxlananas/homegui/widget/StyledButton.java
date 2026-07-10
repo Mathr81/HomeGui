@@ -44,11 +44,11 @@ public class StyledButton extends AbstractWidget {
         boolean hov = isHovered();
         int bx = getX(), by = getY(), bw = getWidth(), bh = getHeight();
 
-        g.fill(bx, by, bx + bw, by + bh, hov ? bgHover : bgNormal);
-        g.fill(bx, by, bx + bw, by + 1, hov ? borderAccent : Theme.BORDER);
-        g.fill(bx, by + bh - 1, bx + bw, by + bh, Theme.BORDER);
-        g.fill(bx, by, bx + 1, by + bh, Theme.BORDER);
-        g.fill(bx + bw - 1, by, bx + bw, by + bh, Theme.BORDER);
+        g.fill(bx, by, bx + bw, by + bh, Theme.bg(hov ? bgHover : bgNormal));
+        g.fill(bx, by, bx + bw, by + 1, Theme.bg(hov ? borderAccent : Theme.BORDER));
+        g.fill(bx, by + bh - 1, bx + bw, by + bh, Theme.bg(Theme.BORDER));
+        g.fill(bx, by, bx + 1, by + bh, Theme.bg(Theme.BORDER));
+        g.fill(bx + bw - 1, by, bx + bw, by + bh, Theme.bg(Theme.BORDER));
 
         Font font = Minecraft.getInstance().font;
         String raw = getMessage().getString();

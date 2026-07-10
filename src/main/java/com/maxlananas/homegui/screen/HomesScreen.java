@@ -1,6 +1,5 @@
 package com.maxlananas.homegui.screen;
 
-import com.maxlananas.homegui.HomeGuiClient;
 import com.maxlananas.homegui.HomesManager;
 import com.maxlananas.homegui.config.LangManager;
 import com.maxlananas.homegui.config.ModConfig;
@@ -175,12 +174,7 @@ public class HomesScreen extends Screen {
             String label = (isFav ? "★ " : "") + home + (uses > 0 ? "  ×" + uses : "");
 
             addRenderableWidget(new StyledButton(listX, rowY, mainBtnW, ROW_H, label,
-                    () -> {
-                        ModConfig.getInstance().incrementUseCount(home);
-                        ModConfig.getInstance().addToHistory(home);
-                        HomeGuiClient.scheduleCoordCapture(home);
-                        HomesManager.getInstance().teleportToHome(home);
-                    }));
+                    () -> HomesManager.getInstance().teleportToHome(home)));
 
             addRenderableWidget(new StyledButton(listX + mainBtnW + 4, rowY, 22, ROW_H,
                     isFav ? "★" : "☆",
@@ -208,12 +202,7 @@ public class HomesScreen extends Screen {
             int cy = listAreaTop + row * (GRID_CARD_H + GRID_GAP);
 
             addRenderableWidget(new StyledButton(cx, cy, GRID_CARD_W, GRID_CARD_H, home,
-                    () -> {
-                        ModConfig.getInstance().incrementUseCount(home);
-                        ModConfig.getInstance().addToHistory(home);
-                        HomeGuiClient.scheduleCoordCapture(home);
-                        HomesManager.getInstance().teleportToHome(home);
-                    }));
+                    () -> HomesManager.getInstance().teleportToHome(home)));
         }
     }
 
@@ -222,7 +211,7 @@ public class HomesScreen extends Screen {
         LangManager L = LangManager.getInstance();
         Font f = font;
 
-        g.fill(0, 0, width, height, Theme.BG);
+        g.fill(0, 0, width, height, Theme.backdrop());
         int panelY = 20;
         int panelH = height - 50;
 
@@ -268,8 +257,8 @@ public class HomesScreen extends Screen {
             int thumbH = Math.max(20, sbH * visibleRows / filtered.size());
             int maxScroll = Math.max(1, filtered.size() - visibleRows);
             int thumbY = listAreaTop + (sbH - thumbH) * scrollOffset / maxScroll;
-            g.fill(sbX, listAreaTop, sbX + 4, listAreaBottom, Theme.CARD);
-            g.fill(sbX, thumbY, sbX + 4, thumbY + thumbH, Theme.ACCENT_DIM);
+            g.fill(sbX, listAreaTop, sbX + 4, listAreaBottom, Theme.bg(Theme.CARD));
+            g.fill(sbX, thumbY, sbX + 4, thumbY + thumbH, Theme.bg(Theme.ACCENT_DIM));
             Theme.fillBorder(g, sbX, thumbY, 4, thumbH, Theme.ACCENT);
         }
     }
@@ -285,7 +274,7 @@ public class HomesScreen extends Screen {
             int rowY = listAreaTop + (i - scrollOffset) * ROW_STEP;
             boolean isFav = ModConfig.getInstance().isFavorite(home);
             if (isFav) {
-                g.fill(listX, rowY, listX + 3, rowY + ROW_H, Theme.GOLD);
+                g.fill(listX, rowY, listX + 3, rowY + ROW_H, Theme.bg(Theme.GOLD));
             }
         }
     }
@@ -307,7 +296,7 @@ public class HomesScreen extends Screen {
             boolean isFav = cfg.isFavorite(home);
             int uses = cfg.getUseCount(home);
 
-            if (isFav) g.fill(cx, cy, cx + GRID_CARD_W, cy + 2, Theme.GOLD);
+            if (isFav) g.fill(cx, cy, cx + GRID_CARD_W, cy + 2, Theme.bg(Theme.GOLD));
 
             String displayName = Theme.truncate(f, home, GRID_CARD_W - 8);
             g.drawCenteredString(f, Component.literal(displayName),
