@@ -1,5 +1,6 @@
 package com.maxlananas.homegui.screen;
 
+import com.maxlananas.homegui.HomeGuiClient;
 import com.maxlananas.homegui.HomesManager;
 import com.maxlananas.homegui.config.LangManager;
 import com.maxlananas.homegui.config.ModConfig;
@@ -10,6 +11,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
@@ -315,6 +317,17 @@ public class HomesScreen extends Screen {
                         cx + GRID_CARD_W / 2, cy + 42, Theme.FAINT);
             }
         }
+    }
+
+    @Override
+    public boolean keyPressed(KeyEvent event) {
+        // Pressing the open-GUI keybind again toggles the menu closed, unless the
+        // search box is focused (so the key can still be typed into a home name).
+        if ((searchBox == null || !searchBox.isFocused()) && HomeGuiClient.matchesOpenKey(event)) {
+            onClose();
+            return true;
+        }
+        return super.keyPressed(event);
     }
 
     @Override
