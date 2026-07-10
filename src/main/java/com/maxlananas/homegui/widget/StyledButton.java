@@ -3,11 +3,13 @@ package com.maxlananas.homegui.widget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 
-public class StyledButton extends Button {
+public class StyledButton extends AbstractWidget {
 
+    private final Runnable onPress;
     private final int bgNormal;
     private final int bgHover;
     private final int borderAccent;
@@ -17,9 +19,8 @@ public class StyledButton extends Button {
     public StyledButton(int x, int y, int w, int h, String label, Runnable onPress,
                         int bgNormal, int bgHover,
                         int borderAccent, int textNormal, int textHover) {
-        super(x, y, w, h, Component.literal(label),
-              b -> onPress.run(),
-              btn -> btn.get());
+        super(x, y, w, h, Component.literal(label));
+        this.onPress = onPress;
         this.bgNormal = bgNormal;
         this.bgHover = bgHover;
         this.borderAccent = borderAccent;
@@ -30,6 +31,11 @@ public class StyledButton extends Button {
     public StyledButton(int x, int y, int w, int h, String label, Runnable onPress) {
         this(x, y, w, h, label, onPress,
              Theme.BTN, Theme.BTN_HOV, Theme.BORDER, Theme.TEXT, 0xFFFFFFFF);
+    }
+
+    @Override
+    public void onClick(double mouseX, double mouseY) {
+        onPress.run();
     }
 
     @Override
@@ -49,5 +55,10 @@ public class StyledButton extends Button {
         int color = hov ? textHover : textNormal;
         g.drawCenteredString(font, Component.literal(label),
                 bx + bw / 2, by + (bh - 8) / 2, color);
+    }
+
+    @Override
+    protected void updateWidgetNarration(NarrationElementOutput narration) {
+        defaultButtonNarrationText(narration);
     }
 }
