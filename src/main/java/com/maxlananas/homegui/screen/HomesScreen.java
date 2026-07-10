@@ -20,6 +20,8 @@ public class HomesScreen extends Screen {
 
     private static final int PANEL_W  = 320;
     private static final int PAD      = 16;
+    private static final int SEARCH_Y  = 60;
+    private static final int TOOLBAR_Y = SEARCH_Y + 24;
     private static final int ROW_H    = 22;
     private static final int ROW_GAP  = 3;
     private static final int ROW_STEP = ROW_H + ROW_GAP;
@@ -79,7 +81,7 @@ public class HomesScreen extends Screen {
 
         panelX = width / 2 - PANEL_W / 2;
         int searchW = PANEL_W - PAD * 2 - 26;
-        int searchY = 50;
+        int searchY = SEARCH_Y;
 
         searchBox = new EditBox(font, panelX + PAD, searchY, searchW, 16, Component.literal("Search"));
         searchBox.setValue(savedSearch);
@@ -228,12 +230,12 @@ public class HomesScreen extends Screen {
         Theme.drawTextCentered(g, f, "✦ " + L.get("title.homes") + " ✦",
                 width / 2, panelY + 10, Theme.ACCENT);
         Theme.drawTextCentered(g, f, "§8" + allHomes.size() + " " + L.get("stats.total_homes"),
-                width / 2, panelY + 24, Theme.DIM);
-        Theme.drawSeparator(g, panelX + PAD, 46, PANEL_W - PAD * 2);
+                width / 2, panelY + 22, Theme.DIM);
+        Theme.drawSeparator(g, panelX + PAD, SEARCH_Y - 7, PANEL_W - PAD * 2);
 
         if (searchBox != null && searchBox.getValue().isEmpty() && !searchBox.isFocused()) {
             g.drawString(f, Component.literal("§7" + L.get("hint.search")),
-                    panelX + PAD + 4, 54, Theme.FAINT);
+                    panelX + PAD + 4, SEARCH_Y + 4, Theme.FAINT);
         }
 
         if (filtered.isEmpty()) {
@@ -249,7 +251,7 @@ public class HomesScreen extends Screen {
 
         super.render(g, mouseX, mouseY, delta);
 
-        int toolbarY = 74;
+        int toolbarY = TOOLBAR_Y;
         Theme.drawSeparator(g, panelX + PAD, toolbarY + 20, PANEL_W - PAD * 2);
         int bottomY = 20 + panelH - 24;
         Theme.drawSeparator(g, panelX + PAD, bottomY - 10, PANEL_W - PAD * 2);
